@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, {useRef, useState} from 'react'
 import Slider from '@mui/material/Slider'
 import { styled } from '@mui/material/styles'
 import Box from '@mui/material/Box'
@@ -51,17 +51,18 @@ function App() {
     setValue(newValue)
   }
 
-  const handlePlusByOne = () => {
-    if (value < 100) {
-      setValue((val) => val + 1)
-    }
+  const timer = useRef(null)
+  const increment = () => {
+    timer.current = setInterval(() => setValue(prev => value < 100 && prev + 1), 50);
+  }
+  const decrement = () => {
+    timer.current = setInterval(() => setValue(prev => value > 0 && prev - 1), 50);
   }
 
-  const handleMinusByOne = () => {
-    if (value > 0) {
-      setValue((val) => val - 1)
-    }
+  function timeoutClear() {
+    clearInterval(timer.current);
   }
+
   return (
     <>
       <Box
@@ -77,7 +78,9 @@ function App() {
         <Stack spacing={2} direction='row' sx={{ mb: 1 }} alignItems='center'>
           <OpacityButton
             aria-label='minus'
-            onClick={handleMinusByOne}
+            onMouseLeave={timeoutClear}
+            onMouseUp={timeoutClear}
+            onMouseDown={decrement}
             sx={{
               color: value === 0 ? '#8C96A0' : '#EB6017',
               backgroundColor: value === 0 ? '#EFEFEF' : 'rgba(235, 96, 23, 0.15)'
@@ -94,7 +97,9 @@ function App() {
           />
           <OpacityButton
             aria-label='plus'
-            onClick={handlePlusByOne}
+            onMouseLeave={timeoutClear}
+            onMouseUp={timeoutClear}
+            onMouseDown={increment}
             sx={{
               color: value === 100 ? '#8C96A0' : '#EB6017',
               backgroundColor: value === 100 ? '#EFEFEF' : 'rgba(235, 96, 23, 0.15)'
